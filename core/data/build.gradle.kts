@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-parcelize")
+    id ("kotlin-kapt")
 }
 
 android {
@@ -33,11 +35,13 @@ android {
 }
 
 dependencies {
-
+    implementation(project(":core:model"))
+    implementation(project(":core:database"))
+    implementation(project(":core:domain"))
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.hilt.android)
+    implementation(libs.timber)
+    kapt(libs.hilt.compiler)
 }
