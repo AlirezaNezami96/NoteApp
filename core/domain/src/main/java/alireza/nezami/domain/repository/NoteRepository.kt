@@ -1,4 +1,4 @@
-package alireza.nezami.data.repository
+package alireza.nezami.domain.repository
 
 import alireza.nezami.model.domain.Note
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +11,7 @@ interface NoteRepository {
     suspend fun insertNote(note: Note): Long
     suspend fun updateNote(note: Note)
     suspend fun deleteNote(note: Note)
+    fun searchNotes(query: String): Flow<List<Note>>
     suspend fun handleReminderNotification(noteId: Long)
     suspend fun updateReminderTime(noteId: Long, reminderTime: LocalDateTime)
     suspend fun clearReminder(noteId: Long)

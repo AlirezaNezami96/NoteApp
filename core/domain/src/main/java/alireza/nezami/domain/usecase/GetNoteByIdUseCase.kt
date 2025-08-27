@@ -1,6 +1,6 @@
 package alireza.nezami.domain.usecase
 
-import alireza.nezami.data.repository.NoteRepository
+import alireza.nezami.domain.repository.NoteRepository
 import alireza.nezami.model.domain.Note
 import javax.inject.Inject
 

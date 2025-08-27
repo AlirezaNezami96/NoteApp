@@ -2,6 +2,7 @@ package alireza.nezami.data.repository
 
 import alireza.nezami.common.helper.ReminderHelper
 import alireza.nezami.database.dao.NoteDao
+import alireza.nezami.domain.repository.NoteRepository
 import alireza.nezami.model.domain.Note
 import alireza.nezami.model.domain.RepeatInterval
 import alireza.nezami.model.mapper.NoteMapper.toDomain
@@ -38,6 +39,11 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun deleteNote(note: Note) =
         noteDao.deleteNote(note.toEntity())
+
+    override fun searchNotes(query: String): Flow<List<Note>> =
+        noteDao.searchNotes(query).map { entities ->
+            entities.map { it.toDomain() }
+        }
 
     override suspend fun handleReminderNotification(noteId: Long) {
         val note = noteDao.getNoteById(noteId)?.toDomain()
