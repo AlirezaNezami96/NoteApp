@@ -5,8 +5,8 @@ import alireza.nezami.model.domain.Note
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetAllNotesUseCase @Inject constructor(
-    private val repository: NoteRepository
+class SearchNotesUseCase @Inject constructor(
+        private val noteRepository: NoteRepository
 ) {
-    operator fun invoke(): Flow<List<Note>> = repository.getAllNotes()
+    operator fun invoke(query: String): Flow<List<Note>> = noteRepository.searchNotes(query)
 }

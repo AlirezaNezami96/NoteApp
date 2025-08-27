@@ -83,7 +83,7 @@ val DarkAndroidBackgroundTheme = BackgroundTheme(color = Gray)
  *        supported. This parameter has no effect if [androidTheme] is `true`.
  */
 @Composable
-fun VideoAppTheme(
+fun NoteAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     androidTheme: Boolean = false,
     disableDynamicTheming: Boolean = true,

@@ -13,7 +13,8 @@ data class HomesUiState(
         val isLoading: Boolean = false,
         val notes: List<Note> = emptyList(),
         val topBarStyle: TopBarStyle = TopBarStyle.Home,
-        val layoutType: LayoutType = LayoutType.Grid
+        val layoutType: LayoutType = LayoutType.Grid,
+        val searchQuery: String = "",
 ) : Parcelable {
 
     sealed class HomePartialState {
@@ -26,6 +27,5 @@ data class HomesUiState(
         data class TopBarStyleChanged(val style: TopBarStyle) : HomePartialState()
         data class LayoutChanged(val isGrid: Boolean) : HomePartialState()
         data object LabelsClicked : HomePartialState()
-        data object AddClicked : HomePartialState()
     }
 }
