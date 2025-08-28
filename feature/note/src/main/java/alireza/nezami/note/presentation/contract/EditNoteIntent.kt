@@ -1,8 +1,9 @@
 package alireza.nezami.note.presentation.contract
 
+import alireza.nezami.model.domain.Note
 import alireza.nezami.model.domain.RepeatInterval
 import java.time.LocalDate
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 import java.time.LocalTime
 
 sealed class EditNoteIntent {
@@ -19,5 +20,5 @@ sealed class EditNoteIntent {
     data class SelectRepeatInterval(val interval: RepeatInterval) : EditNoteIntent()
     data object SaveReminder : EditNoteIntent()
     data object RemoveReminder : EditNoteIntent()
-    data object SaveNote : EditNoteIntent()
+    data class SaveNote(val note: Note?) : EditNoteIntent()
 }

@@ -2,7 +2,7 @@ package alireza.nezami.domain.repository
 
 import alireza.nezami.model.domain.Note
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 
 interface NoteRepository {
     fun getAllNotes(): Flow<List<Note>>

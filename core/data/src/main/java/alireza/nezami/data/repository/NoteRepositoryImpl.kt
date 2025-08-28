@@ -9,7 +9,9 @@ import alireza.nezami.model.mapper.NoteMapper.toDomain
 import alireza.nezami.model.mapper.NoteMapper.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import java.time.ZoneOffset
 import javax.inject.Inject
 
@@ -64,7 +66,7 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun updateReminderTime(noteId: Long, reminderTime: LocalDateTime) {
         noteDao.updateReminderTime(
             noteId,
-            reminderTime.toInstant(ZoneOffset.UTC).toEpochMilli()
+            reminderTime.toInstant(TimeZone.UTC).toEpochMilliseconds()
         )
     }
 

@@ -1,5 +1,5 @@
 package alireza.nezami.home.presentation
-import alireza.nezami.common.utils.base.BaseViewModel
+import alireza.nezami.common.base.BaseViewModel
 import alireza.nezami.designsystem.components.LayoutType
 import alireza.nezami.designsystem.components.TopBarStyle
 import alireza.nezami.domain.usecase.GetAllNotesUseCase

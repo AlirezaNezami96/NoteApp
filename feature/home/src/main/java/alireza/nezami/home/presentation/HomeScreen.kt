@@ -1,8 +1,11 @@
 package alireza.nezami.home.presentation
 
+import alireza.nezami.common.extensions.toDetailedReminderString
+import alireza.nezami.common.extensions.toReminderString
 import alireza.nezami.designsystem.R
 import alireza.nezami.designsystem.components.HomeTopBar
 import alireza.nezami.designsystem.components.LayoutType
+import alireza.nezami.home.presentation.contract.HomeEvent
 import alireza.nezami.home.presentation.contract.HomeIntent
 import alireza.nezami.home.presentation.contract.HomesUiState
 import alireza.nezami.model.domain.Note
@@ -23,12 +26,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeScreen(
-        viewModel: HomeViewModel = hiltViewModel()
+        viewModel: HomeViewModel = hiltViewModel(),
+        onNoteClick: (Note?) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val eventFlow = viewModel.event
+
+    LaunchedEffect(Unit) {
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is HomeEvent.NavigateToEditNote -> onNoteClick(event.note)
+            }
+        }
+    }
 
     HomeContent(
         uiState = uiState,
@@ -124,7 +138,7 @@ fun NoteCard(note: Note, onClick: () -> Unit) {
                 Spacer(Modifier.height(8.dp))
                 AssistChip(onClick = {}, label = {
                     Text(
-                        it.time.toString(),
+                        it.time.toDetailedReminderString(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
