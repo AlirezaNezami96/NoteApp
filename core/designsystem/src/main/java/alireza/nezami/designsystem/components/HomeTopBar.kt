@@ -41,14 +41,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeTopBar(
         style: TopBarStyle,
-        layoutType: LayoutType,
+        layoutType: LayoutType = LayoutType.Grid,
         searchQuery: String = "",
         onBack: () -> Unit,
-        onSearchClick: () -> Unit,
-        onSwitchLayout: () -> Unit,
-        addReminder: () -> Unit,
-        clearSearch: () -> Unit,
-        onSearch: (String) -> Unit
+        onSearchClick: () -> Unit = {},
+        onSwitchLayout: () -> Unit = {},
+        addReminder: () -> Unit = {},
+        clearSearch: () -> Unit = {},
+        onSearch: (String) -> Unit = {}
 ) {
     when (style) {
         TopBarStyle.Home -> {
