@@ -1,7 +1,7 @@
 package alireza.nezami.data.di
 
+import alireza.nezami.data.repository.NoteRepositoryImpl
 import alireza.nezami.domain.repository.NoteRepository
-import alireza.nezami.domain.repository.NoteRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

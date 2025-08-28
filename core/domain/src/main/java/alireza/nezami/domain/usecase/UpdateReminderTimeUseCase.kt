@@ -1,7 +1,7 @@
 package alireza.nezami.domain.usecase
 
 import alireza.nezami.domain.repository.NoteRepository
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 import javax.inject.Inject
 
 class UpdateReminderTimeUseCase @Inject constructor(

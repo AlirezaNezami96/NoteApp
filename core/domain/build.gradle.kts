@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
     id ("kotlin-kapt")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -40,6 +41,9 @@ dependencies {
     implementation(project(":core:database"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation(libs.kotlinx.datetime)
+
 }

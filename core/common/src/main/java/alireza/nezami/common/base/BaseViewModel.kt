@@ -1,4 +1,4 @@
-package alireza.nezami.common.utils.base
+package alireza.nezami.common.base
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle

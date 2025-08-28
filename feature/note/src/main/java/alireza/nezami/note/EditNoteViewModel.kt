@@ -1,16 +1,17 @@
 package alireza.nezami.note
 
-import alireza.nezami.common.utils.base.BaseViewModel
+import alireza.nezami.common.base.BaseViewModel
+import alireza.nezami.model.domain.Note
 import alireza.nezami.model.domain.Reminder
+import alireza.nezami.note.navigation.DetailArgs
 import alireza.nezami.note.presentation.contract.EditNoteEvent
 import alireza.nezami.note.presentation.contract.EditNoteIntent
 import alireza.nezami.note.presentation.contract.EditNoteUiState
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,6 +20,14 @@ class EditNoteViewModel @Inject constructor(
 ) : BaseViewModel<EditNoteUiState, EditNoteUiState.EditNotePartialState, EditNoteEvent, EditNoteIntent>(
     savedStateHandle, EditNoteUiState()
 ) {
+    private val note: Note? = DetailArgs.fromSavedStateHandle(savedStateHandle)?.note
+
+    init {
+        if (note != null) {
+            acceptIntent(EditNoteIntent.UpdateTitle(note.title))
+            acceptIntent(EditNoteIntent.UpdateContent(note.content))
+        }
+    }
 
     override fun mapIntents(intent: EditNoteIntent): Flow<EditNoteUiState.EditNotePartialState> =
         when (intent) {
@@ -64,10 +73,16 @@ class EditNoteViewModel @Inject constructor(
 
             EditNoteIntent.SaveReminder -> flow {
                 val reminder = Reminder(
-                    time = LocalDateTime.of(
-                        uiState.value.selectedDate, uiState.value.selectedTime
+                    time = LocalDateTime(
+                        year = uiState.value.selectedDate.year,
+                        monthNumber = uiState.value.selectedDate.monthValue,
+                        dayOfMonth = uiState.value.selectedDate.dayOfMonth,
+                        hour = uiState.value.selectedTime.hour,
+                        minute = uiState.value.selectedTime.minute,
+                        second = uiState.value.selectedTime.second
                     ), isEnabled = true, repeatInterval = uiState.value.selectedRepeatInterval
                 )
+
                 emit(EditNoteUiState.EditNotePartialState.ReminderSet(reminder))
                 emit(EditNoteUiState.EditNotePartialState.ShowReminderDialog(false))
             }
@@ -88,7 +103,12 @@ class EditNoteViewModel @Inject constructor(
                 emit(EditNoteUiState.EditNotePartialState.ReminderRemoved(0L))
             }
 
-            EditNoteIntent.SaveNote -> emptyFlow()
+            is EditNoteIntent.SaveNote -> flow {
+                val note = intent.note
+                if (note != null) {
+                    emit(EditNoteUiState.EditNotePartialState.NoteUpdated(note))
+                }
+            }
         }
 
     override fun reduceUiState(
@@ -116,6 +136,13 @@ class EditNoteViewModel @Inject constructor(
         is EditNoteUiState.EditNotePartialState.TimeSelected -> previousState.copy(selectedTime = partialState.time)
         is EditNoteUiState.EditNotePartialState.RepeatIntervalSelected -> previousState.copy(
             selectedRepeatInterval = partialState.interval
+        )
+
+        is EditNoteUiState.EditNotePartialState.NoteUpdated -> previousState.copy(
+            title = partialState.note.title,
+            content = partialState.note.content,
+            reminder = partialState.note.reminder,
+            labels = partialState.note.labels
         )
     }
 }

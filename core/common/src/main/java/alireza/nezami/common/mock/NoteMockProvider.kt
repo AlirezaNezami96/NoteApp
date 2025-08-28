@@ -1,9 +1,19 @@
 package alireza.nezami.common.mock
 
+import alireza.nezami.common.extensions.minusDays
+import alireza.nezami.common.extensions.plusDays
+import alireza.nezami.common.extensions.plusHours
+import alireza.nezami.common.extensions.plusMonths
+import alireza.nezami.common.extensions.plusYears
+import alireza.nezami.common.extensions.withHour
+import alireza.nezami.common.extensions.withMinute
 import alireza.nezami.model.domain.Note
 import alireza.nezami.model.domain.Reminder
 import alireza.nezami.model.domain.RepeatInterval
-import java.time.LocalDateTime
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.util.Random
 
 /**
@@ -85,7 +95,8 @@ object NoteMockProvider {
      */
     fun provideMockNotes(): List<Note> {
         val notes = mutableListOf<Note>()
-        val baseTime = LocalDateTime.now()
+        val zone = TimeZone.currentSystemDefault()
+        val baseTime = Clock.System.now().toLocalDateTime(zone)
         val random = Random()
 
         repeat(20) { index ->

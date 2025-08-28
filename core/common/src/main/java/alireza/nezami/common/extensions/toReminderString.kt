@@ -1,53 +1,49 @@
 package alireza.nezami.common.extensions
 
-import alireza.nezami.model.domain.Note
-import alireza.nezami.model.domain.Reminder
-import alireza.nezami.model.domain.RepeatInterval
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.util.Random
-
 /**
  * Converts a LocalDateTime to a human-readable string based on device time
  * Examples: "Today, 18:00", "Tomorrow, 20:00", "Wednesday, 17:00", "September 21", "2026/02/23"
  */
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.until
+
 fun LocalDateTime.toReminderString(): String {
-    val now = LocalDateTime.now()
+    val zone = TimeZone.currentSystemDefault()
+    val now = Clock.System.now().toLocalDateTime(zone)
 
-    // Check if the reminder is in the past
-    if (this.isBefore(now)) {
-        return "Past reminder"
-    }
+    // Past check
+    if (this < now) return "Past reminder"
 
-    val daysDifference = ChronoUnit.DAYS.between(now.toLocalDate(), this.toLocalDate())
-    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    val timeString = this.format(timeFormatter)
+    val daysDifference = now.date.daysUntil(this.date)
+    val timeString = "%02d:%02d".format(this.hour, this.minute)
 
-    return when (daysDifference.toInt()) {
+    return when (daysDifference) {
         0 -> "Today, $timeString"
         1 -> "Tomorrow, $timeString"
-
         in 2..6 -> {
-            val dayFormatter = DateTimeFormatter.ofPattern("EEEE")
-            val dayName = this.format(dayFormatter)
+            val dayName = this.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
             "$dayName, $timeString"
         }
 
-        in 7..365 -> { // Same year - show month and day
+        in 7..365 -> {
             if (this.year == now.year) {
-                val monthDayFormatter = DateTimeFormatter.ofPattern("MMMM d")
-                this.format(monthDayFormatter)
+                "${
+                    this.month.name.lowercase().replaceFirstChar { it.uppercase() }
+                } ${this.dayOfMonth}"
             } else {
-                val fullDateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
-                this.format(fullDateFormatter)
+                "${this.year}/${this.monthNumber}/${this.dayOfMonth}"
             }
         }
 
-        else -> { // More than a year away - show full date
-            val fullDateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
-            this.format(fullDateFormatter)
-        }
+        else -> "${this.year}/${this.monthNumber}/${this.dayOfMonth}"
     }
 }
 
@@ -56,64 +52,86 @@ fun LocalDateTime.toReminderString(): String {
  * Examples: "In 15m", "In 2h", "Today, 18:00", "Tomorrow, 20:00", "Wednesday, 17:00"
  */
 fun LocalDateTime.toDetailedReminderString(): String {
-    val now = LocalDateTime.now()
+    val zone = TimeZone.currentSystemDefault()
+    val now = Clock.System.now().toLocalDateTime(zone)
 
-    // Check if the reminder is in the past
-    if (this.isBefore(now)) {
-        return "Past reminder"
-    }
+    if (this < now) return "Past reminder"
 
-    val daysDifference = ChronoUnit.DAYS.between(now.toLocalDate(), this.toLocalDate())
-    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    val timeString = this.format(timeFormatter)
+    val daysDifference = now.date.daysUntil(this.date)
+    val minutesDifference = now.toInstant(zone).until(this.toInstant(zone), DateTimeUnit.MINUTE)
+    val hoursDifference = now.toInstant(zone).until(this.toInstant(zone), DateTimeUnit.HOUR)
+    val timeString = "%02d:%02d".format(this.hour, this.minute)
 
-    return when (daysDifference.toInt()) {
-        0 -> { // Same day - show granular time for near future
-            val minutesDifference = ChronoUnit.MINUTES.between(now, this)
-            val hoursDifference = ChronoUnit.HOURS.between(now, this)
-
-            when {
-                minutesDifference < 1 -> "Now"
-                minutesDifference < 60 -> "In ${minutesDifference}m"
-                hoursDifference < 12 -> "In ${hoursDifference}h"
-                else -> "Today, $timeString"
-            }
+    return when (daysDifference) {
+        0 -> when {
+            minutesDifference < 1 -> "Now"
+            minutesDifference < 60 -> "In ${minutesDifference}m"
+            hoursDifference < 12 -> "In ${hoursDifference}h"
+            else -> "Today, $timeString"
         }
 
-        1 -> { // Tomorrow - show time for early reminders, or just "Tomorrow" for far ones
-            val totalHours = ChronoUnit.HOURS.between(now, this)
-            when {
-                totalHours < 36 -> "Tomorrow, $timeString"
-                else -> "Tomorrow, $timeString"
-            }
-        }
-
+        1 -> "Tomorrow, $timeString"
         in 2..6 -> {
-            val dayFormatter = DateTimeFormatter.ofPattern("EEEE")
-            val dayName = this.format(dayFormatter)
+            val dayName = this.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
             "$dayName, $timeString"
         }
 
-        in 7..30 -> { // This month - show date and time for closer dates
-            val monthDayFormatter = DateTimeFormatter.ofPattern("MMM d")
-            val monthDayString = this.format(monthDayFormatter)
-            "$monthDayString, $timeString"
+        in 7..30 -> {
+            val monthName = this.month.name.lowercase().replaceFirstChar { it.uppercase() }
+            "$monthName ${this.dayOfMonth}, $timeString"
         }
 
-        in 31..365 -> { // Same year - show month and day
+        in 31..365 -> {
             if (this.year == now.year) {
-                val monthDayFormatter = DateTimeFormatter.ofPattern("MMMM d")
-                this.format(monthDayFormatter)
+                val monthName = this.month.name.lowercase().replaceFirstChar { it.uppercase() }
+                "$monthName ${this.dayOfMonth}"
             } else {
-                val fullDateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
-                this.format(fullDateFormatter)
+                "${this.year}/${this.monthNumber}/${this.dayOfMonth}"
             }
         }
 
-        else -> { // More than a year away - show full date
-            val fullDateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
-            this.format(fullDateFormatter)
-        }
+        else -> "${this.year}/${this.monthNumber}/${this.dayOfMonth}"
     }
 }
 
+fun LocalDateTime.plusDays(
+        days: Int,
+        zone: TimeZone = TimeZone.currentSystemDefault()
+): LocalDateTime = this.toInstant(zone).plus(days, DateTimeUnit.DAY, zone).toLocalDateTime(zone)
+
+fun LocalDateTime.plusWeeks(
+        weeks: Int,
+        zone: TimeZone = TimeZone.currentSystemDefault()
+): LocalDateTime = this.toInstant(zone).plus(weeks, DateTimeUnit.WEEK, zone).toLocalDateTime(zone)
+
+fun LocalDateTime.plusMonths(
+        months: Int,
+        zone: TimeZone = TimeZone.currentSystemDefault()
+): LocalDateTime = this.toInstant(zone).plus(months, DateTimeUnit.MONTH, zone).toLocalDateTime(zone)
+
+fun LocalDateTime.plusYears(
+        years: Int,
+        zone: TimeZone = TimeZone.currentSystemDefault()
+): LocalDateTime = this.toInstant(zone).plus(years, DateTimeUnit.YEAR, zone).toLocalDateTime(zone)
+
+
+fun LocalDateTime.plusDays(days: Long, zone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime =
+    this.toInstant(zone).plus(days, DateTimeUnit.DAY, zone).toLocalDateTime(zone)
+
+fun LocalDateTime.minusDays(days: Long, zone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime =
+    this.toInstant(zone).minus(days, DateTimeUnit.DAY, zone).toLocalDateTime(zone)
+
+fun LocalDateTime.plusMonths(months: Long, zone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime =
+    this.toInstant(zone).plus(months, DateTimeUnit.MONTH, zone).toLocalDateTime(zone)
+
+fun LocalDateTime.plusYears(years: Long, zone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime =
+    this.toInstant(zone).plus(years, DateTimeUnit.YEAR, zone).toLocalDateTime(zone)
+
+fun LocalDateTime.plusHours(hours: Long, zone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime =
+    this.toInstant(zone).plus(hours, DateTimeUnit.HOUR, zone).toLocalDateTime(zone)
+
+fun LocalDateTime.withHour(hour: Int): LocalDateTime =
+    LocalDateTime(year, monthNumber, dayOfMonth, hour, minute, second, nanosecond)
+
+fun LocalDateTime.withMinute(minute: Int): LocalDateTime =
+    LocalDateTime(year, monthNumber, dayOfMonth, hour, minute, second, nanosecond)

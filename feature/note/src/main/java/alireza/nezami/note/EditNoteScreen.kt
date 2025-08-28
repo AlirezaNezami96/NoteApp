@@ -25,14 +25,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import java.time.LocalDate
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun EditNoteScreen(
-        viewModel: EditNoteViewModel = hiltViewModel<EditNoteViewModel>(), onBackPress: () -> Unit
+        viewModel: EditNoteViewModel = hiltViewModel(), onBackPress: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

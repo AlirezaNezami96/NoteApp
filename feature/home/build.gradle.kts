@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     id("kotlin-parcelize")
+    id("kotlinx-serialization")
     id ("kotlin-kapt")
 }
 
@@ -32,6 +34,12 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+    }
 }
 
 dependencies {
@@ -46,7 +54,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.toolingPreview)
     implementation(libs.material3)
-
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)
@@ -54,6 +62,9 @@ dependencies {
     implementation(libs.androidx.foundation.layout)
     implementation(libs.timber)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.navigation)
 }

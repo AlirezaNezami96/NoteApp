@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
     id ("kotlin-kapt")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -41,4 +42,5 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
+    implementation(libs.kotlinx.datetime)
 }
