@@ -69,7 +69,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-
+    implementation(libs.kotlinx.datetime)
     // Feature modules
     implementation(project(":feature:home"))
     implementation(project(":feature:note"))
