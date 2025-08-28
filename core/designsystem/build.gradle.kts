@@ -40,6 +40,7 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
+    implementation(project(":core:common"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material3)
@@ -51,4 +52,6 @@ dependencies {
     implementation(libs.toolingPreview)
     debugImplementation(libs.tooling)
     implementation(libs.timber)
+    implementation(libs.kotlinx.datetime)
+
 }

@@ -1,7 +1,7 @@
 package alireza.nezami.noteapp
 
 import alireza.nezami.data.service.NotificationHelper
-import alireza.nezami.noteapp.ui.theme.NoteAppTheme
+import alireza.nezami.designsystem.theme.NoteAppTheme
 import android.Manifest
 import android.app.AlarmManager
 import android.content.Context

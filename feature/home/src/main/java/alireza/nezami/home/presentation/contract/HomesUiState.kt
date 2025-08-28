@@ -13,7 +13,7 @@ data class HomesUiState(
         val isLoading: Boolean = false,
         val notes: List<Note> = emptyList(),
         val topBarStyle: TopBarStyle = TopBarStyle.Home,
-        val layoutType: LayoutType = LayoutType.Grid,
+        val layoutType: LayoutType = LayoutType.List,
         val searchQuery: String = "",
 ) : Parcelable {
 

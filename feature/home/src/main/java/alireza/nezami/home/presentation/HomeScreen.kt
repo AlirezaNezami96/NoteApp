@@ -1,24 +1,46 @@
 package alireza.nezami.home.presentation
 
-import alireza.nezami.common.extensions.toDetailedReminderString
-import alireza.nezami.common.extensions.toReminderString
 import alireza.nezami.designsystem.R
 import alireza.nezami.designsystem.components.HomeTopBar
+import alireza.nezami.designsystem.components.LabelChip
 import alireza.nezami.designsystem.components.LayoutType
+import alireza.nezami.designsystem.components.ReminderChip
 import alireza.nezami.home.presentation.contract.HomeEvent
 import alireza.nezami.home.presentation.contract.HomeIntent
 import alireza.nezami.home.presentation.contract.HomesUiState
 import alireza.nezami.model.domain.Note
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,8 +52,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeScreen(
-        viewModel: HomeViewModel = hiltViewModel(),
-        onNoteClick: (Note?) -> Unit
+        viewModel: HomeViewModel = hiltViewModel(), onNoteClick: (Note?) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val eventFlow = viewModel.event
@@ -55,34 +76,28 @@ fun HomeContent(
         uiState: HomesUiState,
         onIntent: (HomeIntent) -> Unit,
 ) {
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            HomeTopBar(
-                style = uiState.topBarStyle,
-                layoutType = uiState.layoutType,
-                onBack = { onIntent(HomeIntent.OnBackClick) },
-                onSwitchLayout = { onIntent(HomeIntent.OnSwitchLayout) },
-                onSearch = { query -> onIntent(HomeIntent.OnSearchQueryChange(query)) },
-                addReminder = {},
-                onSearchClick = { onIntent(HomeIntent.OnSearchClick) },
-                clearSearch = { onIntent(HomeIntent.OnClearSearch) },
-                searchQuery = uiState.searchQuery
-            )
-        },
-        bottomBar = {
-            HomeBottomBar(
-                onLabelsClick = { onIntent(HomeIntent.OnLabelsClick) },
-                onAddClick = { onIntent(HomeIntent.OnAddClick) }
-            )
-        }
-    ) { paddingValues ->
+    Scaffold(containerColor = MaterialTheme.colorScheme.background, topBar = {
+        HomeTopBar(
+            style = uiState.topBarStyle,
+            layoutType = uiState.layoutType,
+            onBack = { onIntent(HomeIntent.OnBackClick) },
+            onSwitchLayout = { onIntent(HomeIntent.OnSwitchLayout) },
+            onSearch = { query -> onIntent(HomeIntent.OnSearchQueryChange(query)) },
+            addReminder = {},
+            onSearchClick = { onIntent(HomeIntent.OnSearchClick) },
+            clearSearch = { onIntent(HomeIntent.OnClearSearch) },
+            searchQuery = uiState.searchQuery
+        )
+    }, bottomBar = {
+        HomeBottomBar(
+            onLabelsClick = { onIntent(HomeIntent.OnLabelsClick) },
+            onAddClick = { onIntent(HomeIntent.OnAddClick) })
+    }) { paddingValues ->
         NoteList(
             modifier = Modifier.padding(paddingValues),
             notes = uiState.notes,
             layoutType = uiState.layoutType,
-            onNoteClick = { note -> onIntent(HomeIntent.OnNoteClick(note)) }
-        )
+            onNoteClick = { note -> onIntent(HomeIntent.OnNoteClick(note)) })
     }
 }
 
@@ -97,7 +112,7 @@ fun NoteList(
         LazyVerticalGrid(
             modifier = modifier.fillMaxSize(),
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(8.dp),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -118,6 +133,7 @@ fun NoteList(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NoteCard(note: Note, onClick: () -> Unit) {
     Card(
@@ -126,28 +142,47 @@ fun NoteCard(note: Note, onClick: () -> Unit) {
         onClick = onClick
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(note.title, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(4.dp))
             Text(
-                note.content,
+                note.title.ifBlank { "Untitled" },
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                note.content.ifBlank { "No content" },
                 style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                maxLines = 5,
                 overflow = TextOverflow.Ellipsis
             )
-            note.reminder?.let {
-                Spacer(Modifier.height(8.dp))
-                AssistChip(onClick = {}, label = {
-                    Text(
-                        it.time.toDetailedReminderString(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                })
+
+            if (note.reminder != null || note.labels.isNotEmpty()) {
+                Spacer(Modifier.height(16.dp))
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    note.reminder?.let { reminder ->
+                        ReminderChip(
+                            showRemoveButton = false,
+                            reminder = reminder.time,
+                            onRemoveClick = { }
+                        )
+                    }
+
+                    note.labels.forEach { label ->
+                        LabelChip(
+                            showRemoveButton = false,
+                            label = label,
+                            onRemoveClick = { }
+                        )
+                    }
+                }
             }
         }
     }
 }
-
 
 @Composable
 fun HomeBottomBar(
@@ -159,26 +194,12 @@ fun HomeBottomBar(
         modifier = modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { onLabelsClick() }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_tag),
-                    contentDescription = "Labels",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Labels",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
 
             FloatingActionButton(
                 onClick = onAddClick,

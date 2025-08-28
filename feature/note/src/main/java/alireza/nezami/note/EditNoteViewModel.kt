@@ -36,7 +36,7 @@ class EditNoteViewModel @Inject constructor(
 
     init {
         if (note != null) {
-            acceptIntent(EditNoteIntent.SaveNote(note))
+            acceptIntent(EditNoteIntent.UpdateNote(note))
         }
     }
 
@@ -116,7 +116,8 @@ class EditNoteViewModel @Inject constructor(
 
             is EditNoteIntent.SaveNote -> flow {
                 saveNoteWithAlarm(intent.note)
-
+            }
+            is EditNoteIntent.UpdateNote -> flow {
                 val note = intent.note
                 if (note != null) {
                     emit(EditNoteUiState.EditNotePartialState.NoteUpdated(note))
@@ -182,6 +183,8 @@ class EditNoteViewModel @Inject constructor(
 
                 val isAlarmSet = alarmScheduler.isAlarmSet(savedNote)
                 Timber.d("Alarm is set: $isAlarmSet")
+                publishEvent(EditNoteEvent.ShowSuccess("Note saved successfully"))
+
 
             } catch (e: Exception) {
                 Timber.e(e)
