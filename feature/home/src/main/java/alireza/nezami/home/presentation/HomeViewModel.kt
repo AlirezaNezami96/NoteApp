@@ -47,7 +47,7 @@ class HomeViewModel @Inject constructor(
             emit(HomesUiState.HomePartialState.TopBarStyleChanged(TopBarStyle.Home))
         }
         is HomeIntent.OnSwitchLayout -> flow {
-            emit(HomesUiState.HomePartialState.LayoutChanged(uiState.value.layoutType == LayoutType.Grid))
+            emit(HomesUiState.HomePartialState.LayoutChanged(uiState.value.layoutType != LayoutType.Grid))
         }
         is HomeIntent.OnNoteClick -> flow {
             publishEvent(HomeEvent.NavigateToEditNote(intent.note))

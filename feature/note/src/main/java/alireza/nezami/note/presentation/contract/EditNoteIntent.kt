@@ -21,4 +21,5 @@ sealed class EditNoteIntent {
     data object SaveReminder : EditNoteIntent()
     data object RemoveReminder : EditNoteIntent()
     data class SaveNote(val note: Note?) : EditNoteIntent()
+    data class UpdateNote(val note: Note?) : EditNoteIntent()
 }

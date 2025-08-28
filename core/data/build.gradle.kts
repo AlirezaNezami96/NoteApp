@@ -1,8 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
-    id ("kotlin-kapt")
+    id("kotlin-kapt")
 }
 
 android {
@@ -37,6 +38,7 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:database"))
+    implementation(project(":core:designsystem"))
     implementation(project(":core:domain"))
     implementation(project(":core:common"))
     implementation(libs.kotlinx.coroutines.android)

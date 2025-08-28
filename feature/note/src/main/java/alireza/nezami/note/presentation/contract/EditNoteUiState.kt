@@ -1,6 +1,7 @@
 package alireza.nezami.note.presentation.contract
 
 import alireza.nezami.common.extensions.plusHours
+import alireza.nezami.common.extensions.plusMinutes
 import alireza.nezami.model.domain.Note
 import alireza.nezami.model.domain.Reminder
 import alireza.nezami.model.domain.RepeatInterval
@@ -30,7 +31,7 @@ data class EditNoteUiState(
             val zone = TimeZone.currentSystemDefault()
             val now = Clock.System.now().toLocalDateTime(zone)
             listOf(
-                now.plusHours(12, zone), now.plusHours(24, zone)
+                now.plusMinutes(1, zone), now.plusHours(24, zone)
             )
         }
 ) : Parcelable {

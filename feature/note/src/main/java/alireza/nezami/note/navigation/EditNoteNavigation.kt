@@ -49,7 +49,7 @@ fun NavGraphBuilder.editNoteScreen(
         )
     ) {
         EditNoteScreen(
-            onBackPress = navigateUp
+            onBack = navigateUp
         )
     }
 }

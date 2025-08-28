@@ -12,3 +12,4 @@ enum class RepeatInterval {
     BIANNUALLY, // Every 6 months
     YEARLY
 }
+

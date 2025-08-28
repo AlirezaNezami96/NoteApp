@@ -1,6 +1,9 @@
 package alireza.nezami.note
 
 import alireza.nezami.common.base.BaseViewModel
+import alireza.nezami.data.service.AlarmScheduler
+import alireza.nezami.domain.usecase.InsertNoteUseCase
+import alireza.nezami.domain.usecase.UpdateNoteUseCase
 import alireza.nezami.model.domain.Note
 import alireza.nezami.model.domain.Reminder
 import alireza.nezami.note.navigation.DetailArgs
@@ -8,15 +11,24 @@ import alireza.nezami.note.presentation.contract.EditNoteEvent
 import alireza.nezami.note.presentation.contract.EditNoteIntent
 import alireza.nezami.note.presentation.contract.EditNoteUiState
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class EditNoteViewModel @Inject constructor(
-        savedStateHandle: SavedStateHandle
+        savedStateHandle: SavedStateHandle,
+        private val insertNoteUseCase: InsertNoteUseCase,
+        private val updateNoteUseCase: UpdateNoteUseCase,
+        private val alarmScheduler: AlarmScheduler
 ) : BaseViewModel<EditNoteUiState, EditNoteUiState.EditNotePartialState, EditNoteEvent, EditNoteIntent>(
     savedStateHandle, EditNoteUiState()
 ) {
@@ -24,8 +36,7 @@ class EditNoteViewModel @Inject constructor(
 
     init {
         if (note != null) {
-            acceptIntent(EditNoteIntent.UpdateTitle(note.title))
-            acceptIntent(EditNoteIntent.UpdateContent(note.content))
+            acceptIntent(EditNoteIntent.UpdateNote(note))
         }
     }
 
@@ -104,6 +115,9 @@ class EditNoteViewModel @Inject constructor(
             }
 
             is EditNoteIntent.SaveNote -> flow {
+                saveNoteWithAlarm(intent.note)
+            }
+            is EditNoteIntent.UpdateNote -> flow {
                 val note = intent.note
                 if (note != null) {
                     emit(EditNoteUiState.EditNotePartialState.NoteUpdated(note))
@@ -143,6 +157,52 @@ class EditNoteViewModel @Inject constructor(
             content = partialState.note.content,
             reminder = partialState.note.reminder,
             labels = partialState.note.labels
+        )
+    }
+
+    private fun saveNoteWithAlarm(noteToSave: Note?) {
+        viewModelScope.launch {
+            try {
+                val currentState = uiState.value
+                val noteData = noteToSave ?: createNoteFromCurrentState(currentState)
+
+                val savedNoteId = if (note == null) {
+                    insertNoteUseCase(noteData)
+                } else {
+                    val updatedNote = noteData.copy(id = note.id)
+                    updateNoteUseCase(updatedNote)
+                    note.id
+                }
+
+                val savedNote = noteData.copy(id = savedNoteId)
+                Timber.d("Saved Note $savedNote")
+
+                if (savedNote.reminder?.isEnabled == true) {
+                    alarmScheduler.schedule(savedNote)
+                }
+
+                val isAlarmSet = alarmScheduler.isAlarmSet(savedNote)
+                Timber.d("Alarm is set: $isAlarmSet")
+                publishEvent(EditNoteEvent.ShowSuccess("Note saved successfully"))
+
+
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
+    }
+
+
+    private fun createNoteFromCurrentState(state: EditNoteUiState): Note {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        return Note(
+            id = 0L,
+            title = state.title,
+            content = state.content,
+            createdAt = now,
+            updatedAt = now,
+            labels = state.labels,
+            reminder = state.reminder
         )
     }
 }
