@@ -87,7 +87,7 @@ private fun EditNoteContent(
     }, bottomBar = {
         EditNoteBottomBar(
             onLabelsClick = { onIntent(EditNoteIntent.ToggleLabelDialog) },
-            onAddClick = { onIntent(EditNoteIntent.ToggleReminderDialog) })
+            onSaveClick = { onIntent(EditNoteIntent.SaveNote(null)) })
     }) { paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues).padding(16.dp)
@@ -400,7 +400,7 @@ fun ReminderDialog(
 
 @Composable
 fun EditNoteBottomBar(
-        onLabelsClick: () -> Unit, onAddClick: () -> Unit, modifier: Modifier = Modifier
+        onLabelsClick: () -> Unit, onSaveClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -430,14 +430,14 @@ fun EditNoteBottomBar(
             }
 
             FloatingActionButton(
-                onClick = onAddClick,
+                onClick = onSaveClick,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White,
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(0.dp)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_add),
+                    painter = painterResource(id = R.drawable.ic_tick),
                     contentDescription = "Add",
                     tint = MaterialTheme.colorScheme.surface
                 )

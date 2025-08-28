@@ -1,4 +1,4 @@
-package alireza.nezami.noteapp.service
+package alireza.nezami.data.service
 
 import alireza.nezami.domain.repository.NoteRepository
 import android.content.BroadcastReceiver

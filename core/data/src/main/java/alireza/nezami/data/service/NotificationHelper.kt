@@ -1,7 +1,7 @@
-package alireza.nezami.noteapp.service
+package alireza.nezami.data.service
 
+import alireza.nezami.data.R
 import alireza.nezami.model.domain.Note
-import alireza.nezami.noteapp.R
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -13,9 +13,7 @@ object NotificationHelper {
 
     fun createNotificationChannel(context: Context) {
         val channel = NotificationChannel(
-            CHANNEL_ID,
-            CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
+            CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "Channel for note reminder notifications"
         }
@@ -28,13 +26,11 @@ object NotificationHelper {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(note.title)
-            .setContentText(note.content)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .build()
+        val notification =
+            NotificationCompat.Builder(context, CHANNEL_ID).setContentTitle(note.title)
+                .setSmallIcon(alireza.nezami.designsystem.R.drawable.ic_avatar)
+                .setContentText(note.content).setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true).build()
 
         notificationManager.notify(note.id.toInt(), notification)
     }

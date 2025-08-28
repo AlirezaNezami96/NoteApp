@@ -130,6 +130,9 @@ fun LocalDateTime.plusYears(years: Long, zone: TimeZone = TimeZone.currentSystem
 fun LocalDateTime.plusHours(hours: Long, zone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime =
     this.toInstant(zone).plus(hours, DateTimeUnit.HOUR, zone).toLocalDateTime(zone)
 
+fun LocalDateTime.plusMinutes(minutes: Long, zone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime =
+    this.toInstant(zone).plus(minutes, DateTimeUnit.MINUTE, zone).toLocalDateTime(zone)
+
 fun LocalDateTime.withHour(hour: Int): LocalDateTime =
     LocalDateTime(year, monthNumber, dayOfMonth, hour, minute, second, nanosecond)
 

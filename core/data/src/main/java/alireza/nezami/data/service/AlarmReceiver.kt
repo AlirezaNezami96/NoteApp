@@ -1,4 +1,4 @@
-package alireza.nezami.noteapp.service
+package alireza.nezami.data.service
 
 import alireza.nezami.common.extensions.plusDays
 import alireza.nezami.common.extensions.plusMonths
@@ -9,25 +9,41 @@ import alireza.nezami.model.domain.RepeatInterval
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import javax.inject.Inject
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 
-class AlarmReceiver @Inject constructor(
-        private val noteRepository: NoteRepository, private val alarmScheduler: AlarmScheduler
-) : BroadcastReceiver() {
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface AlarmReceiverEntryPoint {
+    fun getNoteRepository(): NoteRepository
+    fun getAlarmScheduler(): AlarmScheduler
+}
 
+
+class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        val entryPoint = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            AlarmReceiverEntryPoint::class.java
+        )
+        val noteRepository: NoteRepository = entryPoint.getNoteRepository()
+        val alarmScheduler: AlarmScheduler = entryPoint.getAlarmScheduler()
+
         val noteId = intent.getLongExtra(AlarmSchedulerImpl.EXTRA_NOTE_ID, -1L)
         if (noteId == -1L) return
 
         CoroutineScope(Dispatchers.IO).launch {
             val note = noteRepository.getNoteById(noteId) ?: return@launch
 
-            // Show notification
             NotificationHelper.createNotification(context, note)
 
             val reminder = note.reminder ?: return@launch

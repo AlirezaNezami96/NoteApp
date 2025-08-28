@@ -31,12 +31,12 @@
 
 
         <receiver
-            android:name=".service.AlarmReceiver"
+            android:name="alireza.nezami.data.service.AlarmReceiver"
             android:enabled="true"
             android:exported="false" />
 
         <receiver
-            android:name=".service.BootReceiver"
+            android:name="alireza.nezami.data.service.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
