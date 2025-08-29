@@ -47,4 +47,15 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     implementation(project(":core:model"))
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.truth)
+    testImplementation(libs.robolectric)
+
+
+
 }
