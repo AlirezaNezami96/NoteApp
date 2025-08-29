@@ -31,7 +31,7 @@ data class EditNoteUiState(
             val zone = TimeZone.currentSystemDefault()
             val now = Clock.System.now().toLocalDateTime(zone)
             listOf(
-                now.plusMinutes(1, zone), now.plusHours(24, zone)
+                now.plusMinutes(10, zone), now.plusHours(24, zone)
             )
         }
 ) : Parcelable {
