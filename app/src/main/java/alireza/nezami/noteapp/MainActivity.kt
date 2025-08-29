@@ -2,6 +2,9 @@ package alireza.nezami.noteapp
 
 import alireza.nezami.data.service.NotificationHelper
 import alireza.nezami.designsystem.theme.NoteAppTheme
+import alireza.nezami.noteapp.navigation.AppNavHost
+import alireza.nezami.noteapp.navigation.AppState
+import alireza.nezami.noteapp.navigation.rememberAppState
 import android.Manifest
 import android.app.AlarmManager
 import android.content.Context

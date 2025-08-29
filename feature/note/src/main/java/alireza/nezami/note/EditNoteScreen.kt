@@ -13,14 +13,14 @@ import alireza.nezami.note.presentation.contract.EditNoteUiState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -137,6 +137,7 @@ fun EditNoteScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun EditNoteContent(
         uiState: EditNoteUiState,
@@ -163,26 +164,28 @@ private fun EditNoteContent(
                 .padding(16.dp)
         ) {
 
-            Row(modifier = Modifier.fillMaxWidth()) {
+
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 uiState.reminder?.let { reminder ->
                     ReminderChip(
-                        reminder = reminder.time,
+                        reminder = reminder.toReminderString(),
                         onRemoveClick = { onIntent(EditNoteIntent.RemoveReminder) })
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(uiState.labels) { label ->
-                        LabelChip(
-                            label = label,
-                            onRemoveClick = { onIntent(EditNoteIntent.RemoveLabel(label)) })
-                    }
+                uiState.labels.forEach { label ->
+                    LabelChip(
+                        label = label,
+                        onRemoveClick = { onIntent(EditNoteIntent.RemoveLabel(label)) })
                 }
             }
+
+
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(

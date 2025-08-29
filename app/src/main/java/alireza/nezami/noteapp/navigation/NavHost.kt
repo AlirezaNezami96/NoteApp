@@ -1,4 +1,4 @@
-package alireza.nezami.noteapp
+package alireza.nezami.noteapp.navigation
 
 import alireza.nezami.home.navigation.homeNavigationRoute
 import alireza.nezami.home.navigation.homeScreen

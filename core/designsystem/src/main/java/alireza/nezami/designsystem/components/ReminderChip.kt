@@ -23,7 +23,7 @@ import kotlinx.datetime.LocalDateTime
 
 @Composable
 fun ReminderChip(
-        reminder: LocalDateTime,
+        reminder: String,
         showRemoveButton : Boolean = true,
         onRemoveClick: () -> Unit, modifier: Modifier = Modifier
 ) {
@@ -44,7 +44,7 @@ fun ReminderChip(
         )
 
         Text(
-            text = reminder.toReminderString(),
+            text = reminder,
             color = MaterialTheme.colorScheme.surface,
             style = MaterialTheme.typography.bodyMedium
         )

@@ -1,5 +1,6 @@
 package alireza.nezami.home.presentation
 
+import alireza.nezami.common.extensions.toDetailedReminderString
 import alireza.nezami.designsystem.R
 import alireza.nezami.designsystem.components.HomeTopBar
 import alireza.nezami.designsystem.components.LabelChip
@@ -166,7 +167,7 @@ fun NoteCard(note: Note, onClick: () -> Unit) {
                     note.reminder?.let { reminder ->
                         ReminderChip(
                             showRemoveButton = false,
-                            reminder = reminder.time,
+                            reminder = reminder.time.toDetailedReminderString(),
                             onRemoveClick = { }
                         )
                     }

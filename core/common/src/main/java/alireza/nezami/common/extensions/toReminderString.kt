@@ -4,6 +4,8 @@ package alireza.nezami.common.extensions
  * Converts a LocalDateTime to a human-readable string based on device time
  * Examples: "Today, 18:00", "Tomorrow, 20:00", "Wednesday, 17:00", "September 21", "2026/02/23"
  */
+import alireza.nezami.model.domain.Reminder
+import alireza.nezami.model.domain.RepeatInterval
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
@@ -91,6 +93,57 @@ fun LocalDateTime.toDetailedReminderString(): String {
         }
 
         else -> "${this.year}/${this.monthNumber}/${this.dayOfMonth}"
+    }
+}
+
+fun Reminder.toReminderString(): String {
+    val timeString = time.toReminderString()
+
+    return when (repeatInterval) {
+        RepeatInterval.NONE -> timeString
+        RepeatInterval.DAILY -> "Every day, ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        RepeatInterval.WEEKDAYS -> "Every weekday, ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        RepeatInterval.WEEKENDS -> "Every weekend, ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        RepeatInterval.WEEKLY -> {
+            val dayName = time.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
+            "Every week, $dayName ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        }
+        RepeatInterval.BIWEEKLY -> {
+            val dayName = time.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
+            "Every 2 weeks, $dayName ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        }
+        RepeatInterval.MONTHLY -> {
+            val dayOfMonth = time.dayOfMonth
+            val suffix = when {
+                dayOfMonth in 11..13 -> "th"
+                dayOfMonth % 10 == 1 -> "st"
+                dayOfMonth % 10 == 2 -> "nd"
+                dayOfMonth % 10 == 3 -> "rd"
+                else -> "th"
+            }
+            "Every month, $dayOfMonth$suffix ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        }
+        RepeatInterval.QUARTERLY -> {
+            val dayOfMonth = time.dayOfMonth
+            val suffix = when {
+                dayOfMonth in 11..13 -> "th"
+                dayOfMonth % 10 == 1 -> "st"
+                dayOfMonth % 10 == 2 -> "nd"
+                dayOfMonth % 10 == 3 -> "rd"
+                else -> "th"
+            }
+            "Every 3 months, $dayOfMonth$suffix ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        }
+        RepeatInterval.BIANNUALLY -> {
+            val monthName = time.month.name.lowercase().replaceFirstChar { it.uppercase() }
+            val dayOfMonth = time.dayOfMonth
+            "Every 6 months, $monthName $dayOfMonth ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        }
+        RepeatInterval.YEARLY -> {
+            val monthName = time.month.name.lowercase().replaceFirstChar { it.uppercase() }
+            val dayOfMonth = time.dayOfMonth
+            "Every year, $monthName $dayOfMonth ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+        }
     }
 }
 

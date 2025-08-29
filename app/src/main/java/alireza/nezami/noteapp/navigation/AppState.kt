@@ -1,4 +1,4 @@
-package alireza.nezami.noteapp
+package alireza.nezami.noteapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
